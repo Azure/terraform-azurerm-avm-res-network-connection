@@ -6,14 +6,7 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "The name of the this resource."
-
-  validation {
-    condition     = can(regex("TODO", var.name))
-    error_message = "The name must be TODO." # TODO remove the example below once complete:
-    #condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    #error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
-  }
+  description = "Connection name"
 }
 
 variable "resource_group_name" {
@@ -24,6 +17,8 @@ variable "azvirtual_network_gateway_id" {
   type = string
   description = "The ID of the Azure Virtual Network Gateway to connect to."
 }
+
+##
 
 variable "type" {
   description = "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
