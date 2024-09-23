@@ -13,22 +13,15 @@ variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
 }
-variable "virtual_network_gateway_id" {
-  type = string
-  description = "The ID of the Azure Virtual Network Gateway to connect to."
-}
 
-variable "local_network_gateway_id" {
-  type = string
-  description = "The ID of the Azure Local Network Gateway to connect to."
-  default = null
+variable "shared_key" {
+  type        = string
+  description = "value of the shared key for both ends of the connection."
 }
-
-##
 
 variable "type" {
-  description = "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
   type        = string
+  description = "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
 
   validation {
     condition     = contains(["Vnet2Vnet", "ExpressRoute", "IPsec"], var.type)
@@ -36,88 +29,46 @@ variable "type" {
   }
 }
 
-variable "shared_key " {
-  type = string
-  description = "value of the shared key for both ends of the connection."
+variable "virtual_network_gateway_id" {
+  type        = string
+  description = "The ID of the Azure Virtual Network Gateway to connect to."
 }
 
 variable "authorization_key" {
-  type = string
+  type        = string
+  default     = null
   description = "The authorization key for the connection. This field is required only if the type is an ExpressRoute connection"
-  default = null
-} 
-
-variable "dpd_timeout_seconds" {
-  type = string
-  description = "The dead peer detection timeout of this connection in seconds. Changing this forces a new resource to be created."
-  default = null
-} 
-
-variable "express_route_circuit_id" {
-  type = string
-  description = "The ID of the Express Route Circuit when creating an ExpressRoute connection (i.e. when type is ExpressRoute). The Express Route Circuit can be in the same or in a different subscription. Changing this forces a new resource to be created."
-  default = null
-}
-
-variable "express_route_circuit_id" {
-  type = string
-  description = "The ID of the peer virtual network gateway when creating a VNet-to-VNet connection (i.e. when type is Vnet2Vnet). The peer Virtual Network Gateway can be in the same or in a different subscription. Changing this forces a new resource to be created."
-  default = null
-}
-
-variable "local_azure_ip_address_enabled" {
-  type = bool
-  description = "Use private local Azure IP for the connection. Changing this forces a new resource to be created."
-  default = null
-}
-
-variable "local_network_gateway_id" {
-  type = bool
-  description = "The ID of the local network gateway when creating Site-to-Site connection (i.e. when type is IPsec)."
-  default = null
-}
-
-variable "routing_weight" {
-  type = number
-  description = "The routing weight. Defaults to 10"
-  default = null
 }
 
 variable "connection_mode" {
-  type = string
+  type        = string
+  default     = "Default"
   description = "Possible values are Default, InitiatorOnly and ResponderOnly. Defaults to Default"
-  default = null
 
-validation {
-    condition     = contains(["Default", "InitiatorOnly", "ResponderOnly"], var.type)
+  validation {
+    condition     = contains(["Default", "InitiatorOnly", "ResponderOnly"], var.connection_mode)
     error_message = "The type must be one of 'Default', 'InitiatorOnly', or 'ResponderOnly'."
   }
 }
 
 variable "connection_protocol" {
-  type = string
+  type        = string
+  default     = "IKEv2"
   description = "Possible values are IKEv1 and IKEv2, values are IKEv1 and IKEv2. Defaults to IKEv2."
-  default = null
 
-validation {
-    condition     = contains(["IKEv1", "IKEv2"], var.type)
+  validation {
+    condition     = contains(["IKEv1", "IKEv2"], var.connection_protocol)
     error_message = "The type must be one of 'IKEv1, 'IIKEv2'"
   }
 }
 
-variable "enable_bgp"{
-  type = bool
-  description = "If true, BGP (Border Gateway Protocol) is enabled for this connection. Defaults to false."
-  default = null
-} 
-
 variable "custom_bgp_addresses" {
   type = object({
-    primary = string
+    primary   = string
     secondary = optional(string, null)
   })
   default     = null
- description = <<DESCRIPTION
+  description = <<DESCRIPTION
 Custom APIPA Adresses for BGP
 
 - `primary` - Required.
@@ -125,83 +76,65 @@ Custom APIPA Adresses for BGP
 DESCRIPTION
 }
 
-variable "express_route_gateway_bypass"{
-  type = bool
-  description = "If true, data packets will bypass ExpressRoute Gateway for data forwarding This is only valid for ExpressRoute connections"
-  default = null
-} 
-
-variable "private_link_fast_path_enabled " {
-  type = bool
-  description = "Bypass the Express Route gateway when accessing private-links. When enabled express_route_gateway_bypass must be set to"
-  default = null
+variable "dpd_timeout_seconds" {
+  type        = string
+  default     = null
+  description = "The dead peer detection timeout of this connection in seconds. Changing this forces a new resource to be created."
 }
 
-#NAT
-
 variable "egress_nat_rule_ids" {
-  type = list(string)
+  type        = list(string)
+  default     = null
   description = "A list of the egress NAT Rule Ids."
-  default = null
-  
+}
+
+variable "enable_bgp" {
+  type        = bool
+  default     = null
+  description = "If true, BGP (Border Gateway Protocol) is enabled for this connection. Defaults to false."
+}
+
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module.
+For more information see https://aka.ms/avm/telemetry.
+If it is set to false, then no telemetry will be collected.
+DESCRIPTION
+}
+
+variable "express_route_circuit_id" {
+  type        = string
+  default     = null
+  description = "The ID of the Express Route Circuit when creating an ExpressRoute connection (i.e. when type is ExpressRoute). The Express Route Circuit can be in the same or in a different subscription. Changing this forces a new resource to be created."
+}
+
+variable "express_route_gateway_bypass" {
+  type        = bool
+  default     = null
+  description = "If true, data packets will bypass ExpressRoute Gateway for data forwarding This is only valid for ExpressRoute connections"
 }
 
 variable "ingress_nat_rule_ids" {
-  type = list(string)
-  description = "A list of the ingress NAT Rule Ids."
-  default = null
-}
-
-variable "nat_rules" {
-  type = map(object({
-    name = string
-    mode = string
-    translated_address = string
-    source_addresses = list(string)
-    destination_addresses = list(string)
-    translated_port = string
-    source_ports = list(string)
-    destination_ports = list(string)
-    protocol = string
-  }))
+  type        = list(string)
   default     = null
-  description = "A list of NAT Rules."
-}
-variable "use_policy_based_traffic_selectors" {
-  type = bool
-  description = "If true, policy-based traffic selectors are enabled for this connection. Enabling policy-based traffic selectors requires an ipsec_policy block."
-  default = null
-  
-}
-
-variable "traffic_selector_policy" {
-type = map(object({
-    local_address_cidrs = string
-    remote_address_cidrs = string
-  default = null
-}))
- default     = null
- description = <<DESCRIPTION
-CIDR blocks for traffic selectors
-
-- `local_address_cidrs` - Required.
-- `remote_address_cidrs` - Required.
-DESCRIPTION
+  description = "A list of the ingress NAT Rule Ids."
 }
 
 variable "ipsec_policy" {
   type = map(object({
-    dh_group               = string
-    ike_encryption         = string
-    ike_integrity          = string
-    ipsec_encryption       = string
-    ipsec_integrity        = string
-    pfs_group              = string
-    sa_datasize            = optional(string)
-    sa_lifetime            = optional(string)
+    dh_group         = string
+    ike_encryption   = string
+    ike_integrity    = string
+    ipsec_encryption = string
+    ipsec_integrity  = string
+    pfs_group        = string
+    sa_datasize      = optional(string)
+    sa_lifetime      = optional(string)
 
   }))
-  default     = null
+  default     = {}
   description = <<DESCRIPTION
 CIDR blocks for traffic selectors
 
@@ -215,6 +148,18 @@ CIDR blocks for traffic selectors
 -  `sa_lifetime`            = optional The IPSec SA lifetime in seconds. Must be at least 300 seconds. Defaults to 27000 seconds.
 
 DESCRIPTION
+}
+
+variable "local_azure_ip_address_enabled" {
+  type        = bool
+  default     = null
+  description = "Use private local Azure IP for the connection. Changing this forces a new resource to be created."
+}
+
+variable "local_network_gateway_id" {
+  type        = string
+  default     = null
+  description = "The ID of the Azure Local Network Gateway to connect to."
 }
 
 variable "lock" {
@@ -236,6 +181,18 @@ DESCRIPTION
   }
 }
 
+variable "private_link_fast_path_enabled" {
+  type        = bool
+  default     = null
+  description = "Bypass the Express Route gateway when accessing private-links. When enabled express_route_gateway_bypass must be set to"
+}
+
+variable "routing_weight" {
+  type        = number
+  default     = null
+  description = "The routing weight. Defaults to 10"
+}
+
 # tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
@@ -243,3 +200,22 @@ variable "tags" {
   description = "(Optional) Tags of the resource."
 }
 
+variable "traffic_selector_policy" {
+  type = map(object({
+    local_address_cidrs  = string
+    remote_address_cidrs = string
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+CIDR blocks for traffic selectors
+
+- `local_address_cidrs` - Required.
+- `remote_address_cidrs` - Required.
+DESCRIPTION
+}
+
+variable "use_policy_based_traffic_selectors" {
+  type        = bool
+  default     = null
+  description = "If true, policy-based traffic selectors are enabled for this connection. Enabling policy-based traffic selectors requires an ipsec_policy block."
+}
