@@ -1,8 +1,58 @@
 # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-resource "azurerm_resource_group" "TODO" {
-  location = var.location
-  name     = var.name # calling code must supply the name
-  tags     = var.tags
+resource "azurerm_virtual_network_gateway_connection" "this" {
+  location                       = var.location
+  name                           = var.name
+  resource_group_name            = var.resource_group_name
+  type                           = var.type
+  virtual_network_gateway_id     = var.virtual_network_gateway_resource_id
+  authorization_key              = var.authorization_key
+  connection_mode                = var.connection_mode
+  connection_protocol            = var.connection_protocol
+  dpd_timeout_seconds            = var.dpd_timeout_seconds
+  egress_nat_rule_ids            = var.egress_nat_rule_resource_ids
+  enable_bgp                     = var.enable_bgp
+  express_route_circuit_id       = var.express_route_circuit_resource_id
+  express_route_gateway_bypass   = var.express_route_gateway_bypass
+  ingress_nat_rule_ids           = var.ingress_nat_rule_resource_ids
+  local_azure_ip_address_enabled = var.local_azure_ip_address_enabled
+  #Non Required
+  local_network_gateway_id           = var.local_network_gateway_resource_id
+  private_link_fast_path_enabled     = var.private_link_fast_path_enabled
+  routing_weight                     = var.routing_weight
+  shared_key                         = var.shared_key
+  tags                               = var.tags
+  use_policy_based_traffic_selectors = var.use_policy_based_traffic_selectors
+
+  dynamic "custom_bgp_addresses" {
+    for_each = var.custom_bgp_addresses == null ? [] : ["custom_bgp_addresses"]
+
+    content {
+      primary   = var.custom_bgp_addresses.primary
+      secondary = var.custom_bgp_addresses.secondary
+    }
+  }
+  dynamic "ipsec_policy" {
+    for_each = var.ipsec_policy
+
+    content {
+      dh_group         = ipsec_policy.value.dh_group
+      ike_encryption   = ipsec_policy.value.ike_encryption
+      ike_integrity    = ipsec_policy.value.ike_integrity
+      ipsec_encryption = ipsec_policy.value.ipsec_encryption
+      ipsec_integrity  = ipsec_policy.value.ipsec_integrity
+      pfs_group        = ipsec_policy.value.pfs_group
+      sa_datasize      = ipsec_policy.value.sa_datasize
+      sa_lifetime      = ipsec_policy.value.sa_lifetime
+    }
+  }
+  dynamic "traffic_selector_policy" {
+    for_each = var.traffic_selector_policy
+
+    content {
+      local_address_cidrs  = traffic_selector_policy.value.local_address_cidrs
+      remote_address_cidrs = traffic_selector_policy.value.remote_address_cidrs
+    }
+  }
 }
 
 # required AVM resources interfaces
@@ -11,19 +61,6 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
-  scope      = azurerm_MY_RESOURCE.this.id # TODO: Replace with your azurerm resource name
+  scope      = azurerm_virtual_network_gateway_connection.this.id # TODO: Replace with your azurerm resource name
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
-}
-
-resource "azurerm_role_assignment" "this" {
-  for_each = var.role_assignments
-
-  principal_id                           = each.value.principal_id
-  scope                                  = azurerm_resource_group.TODO.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-  condition                              = each.value.condition
-  condition_version                      = each.value.condition_version
-  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
