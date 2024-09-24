@@ -9,11 +9,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.74"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
+      version = "~> 3.110"
     }
     random = {
       source  = "hashicorp/random"
@@ -53,19 +49,71 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
+resource "azurerm_virtual_network" "this" {
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.virtual_network.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_subnet" "gateway_subnet" {
+  address_prefixes     = ["10.0.1.0/24"]
+  name                 = "GatewaySubnet"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this.name
+}
+
+resource "azurerm_local_network_gateway" "onpremise" {
+  location            = azurerm_resource_group.this.location
+  name                = "onpremise"
+  resource_group_name = azurerm_resource_group.this.name
+  address_space       = ["10.1.1.0/24"]
+  gateway_address     = "168.62.225.23"
+}
+
+resource "azurerm_public_ip" "this" {
+  allocation_method   = "Static"
+  location            = azurerm_resource_group.this.location
+  name                = "${module.naming.public_ip.name_unique}-1"
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  zones               = ["1", "2", "3"]
+}
+
+resource "azurerm_virtual_network_gateway" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.virtual_network_gateway.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "VpnGw1AZ"
+  type                = "Vpn"
+  active_active       = true
+  enable_bgp          = false
+  vpn_type            = "RouteBased"
+
+  ip_configuration {
+    public_ip_address_id          = azurerm_public_ip.this.id
+    subnet_id                     = azurerm_subnet.gateway_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # source             = "Azure/avm-res-network-connection/azurerm"
   # ...
-  location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  location                            = azurerm_resource_group.this.location
+  name                                = module.naming.virtual_network_gateway_connection.name_unique # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
+  resource_group_name                 = azurerm_resource_group.this.name
+  type                                = "IPsec"
+  shared_key                          = "abc123"
+  virtual_network_gateway_resource_id = azurerm_virtual_network_gateway.this.id
+  local_network_gateway_resource_id   = azurerm_local_network_gateway.onpremise.id
+  enable_telemetry                    = var.enable_telemetry # see variables.tf
 }
 ```
 
@@ -76,9 +124,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.74)
-
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.110)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
@@ -86,7 +132,12 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_local_network_gateway.onpremise](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/local_network_gateway) (resource)
+- [azurerm_public_ip.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_subnet.gateway_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
+- [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
+- [azurerm_virtual_network_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_gateway) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 
 <!-- markdownlint-disable MD013 -->
