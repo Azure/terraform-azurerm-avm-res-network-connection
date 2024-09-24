@@ -104,12 +104,12 @@ module "test" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location                   = azurerm_resource_group.this.location
-  name                       = module.naming.virtual_network_gateway_connection.name_unique # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name        = azurerm_resource_group.this.name
-  type                       = "IPsec"
-  shared_key                 = "abc123"
-  virtual_network_gateway_id = azurerm_virtual_network_gateway.this.id
-  local_network_gateway_id   = azurerm_local_network_gateway.onpremise.id
-  enable_telemetry           = var.enable_telemetry # see variables.tf
+  location                            = azurerm_resource_group.this.location
+  name                                = module.naming.virtual_network_gateway_connection.name_unique # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
+  resource_group_name                 = azurerm_resource_group.this.name
+  type                                = "IPsec"
+  shared_key                          = "abc123"
+  virtual_network_gateway_resource_id = azurerm_virtual_network_gateway.this.id
+  local_network_gateway_resource_id   = azurerm_local_network_gateway.onpremise.id
+  enable_telemetry                    = var.enable_telemetry # see variables.tf
 }
