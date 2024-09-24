@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.110"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -84,7 +80,7 @@ resource "azurerm_virtual_network_gateway" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "VpnGw1AZ"
   type                = "Vpn"
-  active_active       = false
+  active_active       = true
   enable_bgp          = false
   vpn_type            = "RouteBased"
 
