@@ -201,6 +201,7 @@ variable "tags" {
 }
 
 variable "traffic_selector_policy" {
+
   type = map(object({
     local_address_cidrs  = string
     remote_address_cidrs = string
