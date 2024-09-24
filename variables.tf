@@ -29,7 +29,7 @@ variable "type" {
   }
 }
 
-variable "virtual_network_gateway_id" {
+variable "virtual_network_gateway_resource_id" {
   type        = string
   description = "The ID of the Azure Virtual Network Gateway to connect to."
 }
@@ -37,7 +37,7 @@ variable "virtual_network_gateway_id" {
 variable "authorization_key" {
   type        = string
   default     = null
-  description = "The authorization key for the connection. This field is required only if the type is an ExpressRoute connection"
+  description = "The authorization key for the connection. This field is required only if the type is an `ExpressRoute` connection"
 }
 
 variable "connection_mode" {
@@ -54,7 +54,7 @@ variable "connection_mode" {
 variable "connection_protocol" {
   type        = string
   default     = "IKEv2"
-  description = "Possible values are IKEv1 and IKEv2, values are IKEv1 and IKEv2. Defaults to IKEv2."
+  description = "Possible values are `IKEv1` and `IKEv2`. Defaults to `IKEv2`. Changing this forces a new resource to be created. -> Note: Only valid for IPSec connections on virtual network gateways with SKU `VpnGw1`, `VpnGw2`, `VpnGw3`, `VpnGw1AZ`, `VpnGw2AZ` or `VpnGw3AZ`."
 
   validation {
     condition     = contains(["IKEv1", "IKEv2"], var.connection_protocol)
@@ -71,8 +71,8 @@ variable "custom_bgp_addresses" {
   description = <<DESCRIPTION
 Custom APIPA Adresses for BGP
 
-- `primary` - Required.
-- `secondary` - (Optional) Configure in an Active/Active Gateway setting.
+- `primary` - (Required) - A single IP address that is part of the `azurerm_virtual_network_gateway` ip_configuration (first one)
+- `secondary` - (Optional) - A single IP address that is part of the `azurerm_virtual_network_gateway` ip_configuration (second one). Configure in an Active/Active Gateway setting.
 DESCRIPTION
 }
 
@@ -82,7 +82,7 @@ variable "dpd_timeout_seconds" {
   description = "The dead peer detection timeout of this connection in seconds. Changing this forces a new resource to be created."
 }
 
-variable "egress_nat_rule_ids" {
+variable "egress_nat_rule_resource_ids" {
   type        = list(string)
   default     = null
   description = "A list of the egress NAT Rule Ids."
@@ -90,8 +90,8 @@ variable "egress_nat_rule_ids" {
 
 variable "enable_bgp" {
   type        = bool
-  default     = null
-  description = "If true, BGP (Border Gateway Protocol) is enabled for this connection. Defaults to false."
+  default     = false
+  description = "If true, BGP (Border Gateway Protocol) is enabled for this connection. Defaults to `false`."
 }
 
 variable "enable_telemetry" {
@@ -104,19 +104,19 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "express_route_circuit_id" {
+variable "express_route_circuit_resource_id" {
   type        = string
   default     = null
-  description = "The ID of the Express Route Circuit when creating an ExpressRoute connection (i.e. when type is ExpressRoute). The Express Route Circuit can be in the same or in a different subscription. Changing this forces a new resource to be created."
+  description = "The ID of the Express Route Circuit when creating an ExpressRoute connection (i.e. when `type` is `ExpressRoute`). The Express Route Circuit can be in the same or in a different subscription. Changing this forces a new resource to be created."
 }
 
 variable "express_route_gateway_bypass" {
   type        = bool
   default     = null
-  description = "If true, data packets will bypass ExpressRoute Gateway for data forwarding This is only valid for ExpressRoute connections"
+  description = "If `true`, data packets will bypass ExpressRoute Gateway for data forwarding This is only valid for ExpressRoute connections"
 }
 
-variable "ingress_nat_rule_ids" {
+variable "ingress_nat_rule_resource_ids" {
   type        = list(string)
   default     = null
   description = "A list of the ingress NAT Rule Ids."
@@ -138,14 +138,14 @@ variable "ipsec_policy" {
   description = <<DESCRIPTION
 CIDR blocks for traffic selectors
 
--  `dh_group `             = (Required) The DH group used in IKE phase 1 for initial SA. Valid options are DHGroup1, DHGroup14, DHGroup2, DHGroup2048, DHGroup24, ECP256, ECP384, or None.
--  `ike_encryption`         = (Required) The IKE encryption algorithm. Valid options are AES128, AES192, AES256, DES, DES3, GCMAES128, or GCMAES256.
--  `ike_integrity`          = (Required) The IKE integrity algorithm. Valid options are GCMAES128, GCMAES256, MD5, SHA1, SHA256, or SHA384.
--  `ipsec_encryption`       = (Required) The IPSec encryption algorithm. Valid options are AES128, AES192, AES256, DES, DES3, GCMAES128, GCMAES192, GCMAES256, or None.
--  `ipsec_integrity`        = (Required) The IPSec integrity algorithm. Valid options are GCMAES128, GCMAES192, GCMAES256, MD5, SHA1, or SHA256.
--  `pfs_group`              = (Required) The DH group used in IKE phase 2 for new child SA. Valid options are ECP256, ECP384, PFS1, PFS14, PFS2, PFS2048, PFS24, PFSMM, or None.
--  `sa_datasize`            = (optional) The IPSec SA payload size in KB. Must be at least 1024 KB. Defaults to 102400000 KB.
--  `sa_lifetime`            = optional The IPSec SA lifetime in seconds. Must be at least 300 seconds. Defaults to 27000 seconds.
+-  `dh_group `              - (Required) - The DH group used in IKE phase 1 for initial SA. Valid options are `DHGroup1`, `DHGroup14`, `DHGroup2`, `DHGroup2048`, `DHGroup24`, `ECP256`, `ECP384`, or `None`.
+-  `ike_encryption`         - (Required) - The IKE encryption algorithm. Valid options are `AES128`, `AES192`, `AES256`, `DES`, `DES3`, `GCMAES128`, or `GCMAES256`.
+-  `ike_integrity`          - (Required) - The IKE integrity algorithm. Valid options are `GCMAES128`, `GCMAES256`, `MD5`, `SHA1`, `SHA256`, or `SHA384`.
+-  `ipsec_encryption`       - (Required) - The IPSec encryption algorithm. Valid options are `AES128`, `AES192`, `AES256`, `DES`, `DES3`, `GCMAES128`, `GCMAES192`, `GCMAES256`, or `None`.
+-  `ipsec_integrity`        - (Required) - The IPSec integrity algorithm. Valid options are `GCMAES128`, `GCMAES192`, `GCMAES256`, `MD5`, `SHA1`, or `SHA256`.
+-  `pfs_group`              - (Required) - The DH group used in IKE phase 2 for new child SA. Valid options are `ECP256`, `ECP384`, `PFS1`, `PFS14`, `PFS2`, `PFS2048`, `PFS24`, `PFSMM`, or `None`.
+-  `sa_datasize`            - (Optional) - The IPSec SA payload size in KB. Must be at least `1024` KB. Defaults to `102400000` KB.
+-  `sa_lifetime`            - (Optional) - The IPSec SA lifetime in seconds. Must be at least `300` seconds. Defaults to `27000` seconds.
 
 DESCRIPTION
 }
@@ -156,10 +156,10 @@ variable "local_azure_ip_address_enabled" {
   description = "Use private local Azure IP for the connection. Changing this forces a new resource to be created."
 }
 
-variable "local_network_gateway_id" {
+variable "local_network_gateway_resource_id" {
   type        = string
   default     = null
-  description = "The ID of the Azure Local Network Gateway to connect to."
+  description = "The ID of the Azure Local Network Gateway to connect to when creating a Site-to-Site connection."
 }
 
 variable "lock" {
@@ -183,8 +183,8 @@ DESCRIPTION
 
 variable "private_link_fast_path_enabled" {
   type        = bool
-  default     = null
-  description = "Bypass the Express Route gateway when accessing private-links. When enabled express_route_gateway_bypass must be set to"
+  default     = false
+  description = "Bypass the Express Route gateway when accessing private-links. When enabled `express_route_gateway_bypass` must be set to `true`.  Defaults to `false`."
 }
 
 variable "routing_weight" {
@@ -201,17 +201,16 @@ variable "tags" {
 }
 
 variable "traffic_selector_policy" {
-
   type = map(object({
-    local_address_cidrs  = string
-    remote_address_cidrs = string
+    local_address_cidrs  = list(string)
+    remote_address_cidrs = list(string)
   }))
   default     = {}
   description = <<DESCRIPTION
 CIDR blocks for traffic selectors
 
-- `local_address_cidrs` - Required.
-- `remote_address_cidrs` - Required.
+- `local_address_cidrs` - Required - List of local address CIDRs.
+- `remote_address_cidrs` - Required - List of Remote Address CIDRs.
 DESCRIPTION
 }
 
