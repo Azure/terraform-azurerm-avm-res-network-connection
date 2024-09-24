@@ -102,7 +102,7 @@ resource "azurerm_virtual_network_gateway" "this" {
 # with a data source.
 module "test" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # source             = "Azure/avm-res-network-connection/azurerm"
   # ...
   location                            = azurerm_resource_group.this.location
   name                                = module.naming.virtual_network_gateway_connection.name_unique # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
