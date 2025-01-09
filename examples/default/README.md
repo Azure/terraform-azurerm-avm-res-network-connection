@@ -102,11 +102,13 @@ resource "azurerm_virtual_network_gateway" "this" {
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.this.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
+    name                          = "ipconfig1"
     private_ip_address_allocation = "Dynamic"
   }
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.this_2.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
+    name                          = "ipconfig2"
     private_ip_address_allocation = "Dynamic"
   }
 }
