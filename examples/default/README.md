@@ -80,6 +80,15 @@ resource "azurerm_public_ip" "this" {
   zones               = ["1", "2", "3"]
 }
 
+resource "azurerm_public_ip" "this_2" {
+  allocation_method   = "Static"
+  location            = azurerm_resource_group.this.location
+  name                = "${module.naming.public_ip.name_unique}-2"
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  zones               = ["1", "2", "3"]
+}
+
 resource "azurerm_virtual_network_gateway" "this" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network_gateway.name_unique
@@ -92,6 +101,11 @@ resource "azurerm_virtual_network_gateway" "this" {
 
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.this.id
+    subnet_id                     = azurerm_subnet.gateway_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+  ip_configuration {
+    public_ip_address_id          = azurerm_public_ip.this_2.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -134,6 +148,7 @@ The following resources are used by this module:
 
 - [azurerm_local_network_gateway.onpremise](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/local_network_gateway) (resource)
 - [azurerm_public_ip.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) (resource)
+- [azurerm_public_ip.this_2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_subnet.gateway_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)

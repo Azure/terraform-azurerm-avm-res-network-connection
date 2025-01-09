@@ -74,6 +74,15 @@ resource "azurerm_public_ip" "this" {
   zones               = ["1", "2", "3"]
 }
 
+resource "azurerm_public_ip" "this_2" {
+  allocation_method   = "Static"
+  location            = azurerm_resource_group.this.location
+  name                = "${module.naming.public_ip.name_unique}-2"
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  zones               = ["1", "2", "3"]
+}
+
 resource "azurerm_virtual_network_gateway" "this" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network_gateway.name_unique
@@ -86,6 +95,11 @@ resource "azurerm_virtual_network_gateway" "this" {
 
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.this.id
+    subnet_id                     = azurerm_subnet.gateway_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+  ip_configuration {
+    public_ip_address_id          = azurerm_public_ip.this_2.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
     private_ip_address_allocation = "Dynamic"
   }
