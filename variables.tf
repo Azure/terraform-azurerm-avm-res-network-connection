@@ -148,6 +148,7 @@ CIDR blocks for traffic selectors
 -  `sa_lifetime`            - (Optional) - The IPSec SA lifetime in seconds. Must be at least `300` seconds. Defaults to `27000` seconds.
 
 DESCRIPTION
+  nullable    = false
 }
 
 variable "local_azure_ip_address_enabled" {
@@ -212,6 +213,7 @@ CIDR blocks for traffic selectors
 - `local_address_cidrs` - Required - List of local address CIDRs.
 - `remote_address_cidrs` - Required - List of Remote Address CIDRs.
 DESCRIPTION
+  nullable    = false
 }
 
 variable "use_policy_based_traffic_selectors" {
