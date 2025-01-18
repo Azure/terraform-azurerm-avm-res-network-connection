@@ -1,4 +1,3 @@
-# TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
 resource "azurerm_virtual_network_gateway_connection" "this" {
   location                           = var.location
   name                               = var.name
