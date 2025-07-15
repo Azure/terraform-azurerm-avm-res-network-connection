@@ -14,11 +14,6 @@ variable "resource_group_name" {
   description = "The resource group where the resources will be deployed."
 }
 
-variable "shared_key" {
-  type        = string
-  description = "value of the shared key for both ends of the connection."
-}
-
 variable "type" {
   type        = string
   description = "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
@@ -57,8 +52,8 @@ variable "connection_protocol" {
   description = "Possible values are `IKEv1` and `IKEv2`. Defaults to `IKEv2`. Changing this forces a new resource to be created. -> Note: Only valid for IPSec connections on virtual network gateways with SKU `VpnGw1`, `VpnGw2`, `VpnGw3`, `VpnGw1AZ`, `VpnGw2AZ` or `VpnGw3AZ`."
 
   validation {
-    condition     = contains(["IKEv1", "IKEv2"], var.connection_protocol)
-    error_message = "The type must be one of 'IKEv1, 'IIKEv2'"
+    condition     = contains(["IKEv1", "IKEv2", null], var.connection_protocol)
+    error_message = "The type must be one of 'IKEv1', 'IKEv2' or null"
   }
 }
 
@@ -192,6 +187,12 @@ variable "routing_weight" {
   type        = number
   default     = null
   description = "The routing weight. Defaults to 10"
+}
+
+variable "shared_key" {
+  type        = string
+  default     = null
+  description = "value of the shared key for both ends of the connection."
 }
 
 # tflint-ignore: terraform_unused_declarations

@@ -57,12 +57,6 @@ Description: The resource group where the resources will be deployed.
 
 Type: `string`
 
-### <a name="input_shared_key"></a> [shared\_key](#input\_shared\_key)
-
-Description: value of the shared key for both ends of the connection.
-
-Type: `string`
-
 ### <a name="input_type"></a> [type](#input\_type)
 
 Description: The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'.
@@ -257,6 +251,14 @@ Default: `false`
 Description: The routing weight. Defaults to 10
 
 Type: `number`
+
+Default: `null`
+
+### <a name="input_shared_key"></a> [shared\_key](#input\_shared\_key)
+
+Description: value of the shared key for both ends of the connection.
+
+Type: `string`
 
 Default: `null`
 
