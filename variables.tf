@@ -16,6 +16,7 @@ variable "resource_group_name" {
 
 variable "shared_key" {
   type        = string
+  default     = null
   description = "value of the shared key for both ends of the connection."
 }
 
@@ -57,8 +58,8 @@ variable "connection_protocol" {
   description = "Possible values are `IKEv1` and `IKEv2`. Defaults to `IKEv2`. Changing this forces a new resource to be created. -> Note: Only valid for IPSec connections on virtual network gateways with SKU `VpnGw1`, `VpnGw2`, `VpnGw3`, `VpnGw1AZ`, `VpnGw2AZ` or `VpnGw3AZ`."
 
   validation {
-    condition     = contains(["IKEv1", "IKEv2"], var.connection_protocol)
-    error_message = "The type must be one of 'IKEv1, 'IIKEv2'"
+    condition     = contains(["IKEv1", "IKEv2", null], var.connection_protocol)
+    error_message = "The type must be one of 'IKEv1', 'IKEv2' or null"
   }
 }
 
