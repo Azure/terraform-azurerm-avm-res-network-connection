@@ -1,5 +1,6 @@
 terraform {
   required_version = "~> 1.8"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -48,10 +49,10 @@ resource "azurerm_resource_group" "this" {
 }
 
 resource "azurerm_virtual_network" "this" {
-  address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network.name_unique
   resource_group_name = azurerm_resource_group.this.name
+  address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "gateway_subnet" {
@@ -98,16 +99,16 @@ resource "azurerm_virtual_network_gateway" "this" {
   vpn_type            = "RouteBased"
 
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.this.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
     name                          = "ipconfig1"
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.this.id
   }
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.this_2.id
     subnet_id                     = azurerm_subnet.gateway_subnet.id
     name                          = "ipconfig2"
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.this_2.id
   }
 }
 
@@ -118,14 +119,15 @@ resource "azurerm_virtual_network_gateway" "this" {
 # with a data source.
 module "test" {
   source = "../../"
+
   # source             = "Azure/avm-res-network-connection/azurerm"
   # ...
   location                            = azurerm_resource_group.this.location
   name                                = module.naming.virtual_network_gateway_connection.name_unique # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
   resource_group_name                 = azurerm_resource_group.this.name
   type                                = "IPsec"
-  shared_key                          = "abc123"
   virtual_network_gateway_resource_id = azurerm_virtual_network_gateway.this.id
-  local_network_gateway_resource_id   = azurerm_local_network_gateway.onpremise.id
   enable_telemetry                    = var.enable_telemetry # see variables.tf
+  local_network_gateway_resource_id   = azurerm_local_network_gateway.onpremise.id
+  shared_key                          = "abc123"
 }

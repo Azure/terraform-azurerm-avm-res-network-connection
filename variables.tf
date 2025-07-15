@@ -14,12 +14,6 @@ variable "resource_group_name" {
   description = "The resource group where the resources will be deployed."
 }
 
-variable "shared_key" {
-  type        = string
-  default     = null
-  description = "value of the shared key for both ends of the connection."
-}
-
 variable "type" {
   type        = string
   description = "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
@@ -193,6 +187,12 @@ variable "routing_weight" {
   type        = number
   default     = null
   description = "The routing weight. Defaults to 10"
+}
+
+variable "shared_key" {
+  type        = string
+  default     = null
+  description = "value of the shared key for both ends of the connection."
 }
 
 # tflint-ignore: terraform_unused_declarations
