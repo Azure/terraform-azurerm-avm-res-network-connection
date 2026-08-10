@@ -29,6 +29,7 @@ resource "azurerm_virtual_network_gateway_connection" "this" {
       secondary = var.custom_bgp_addresses.secondary
     }
   }
+
   dynamic "ipsec_policy" {
     for_each = var.ipsec_policy
 
@@ -43,6 +44,7 @@ resource "azurerm_virtual_network_gateway_connection" "this" {
       sa_lifetime      = ipsec_policy.value.sa_lifetime
     }
   }
+
   dynamic "traffic_selector_policy" {
     for_each = var.traffic_selector_policy
 
