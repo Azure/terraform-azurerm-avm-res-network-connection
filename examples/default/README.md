@@ -34,7 +34,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.3.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 # This allows us to randomize the region for the resource group.
@@ -135,7 +135,7 @@ module "test" {
   resource_group_name                 = azurerm_resource_group.this.name
   type                                = "IPsec"
   virtual_network_gateway_resource_id = azurerm_virtual_network_gateway.this.id
-  enable_telemetry                    = false # see variables.tf
+  enable_telemetry                    = var.enable_telemetry # see variables.tf
   local_network_gateway_resource_id   = azurerm_local_network_gateway.onpremise.id
   shared_key                          = "abc123"
 }
@@ -182,7 +182,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 
